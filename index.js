@@ -10,6 +10,13 @@ const headers = {
   'User-Agent': 'node:scraper:0.1.0 (by /u/atkinchris)',
 }
 
+const formatDate = (date) =>
+  date
+    .toISOString()
+    .replace(/\.\d{3}Z/, '')
+    .replace(/T/, '_')
+    .replace(/[\W]+/g, '-')
+
 const fetchWithHeaders = async (url, options = {}) => {
   const response = await fetch(url, { ...options, headers: { ...headers, ...options.headers } })
   if (!response.ok) throw Error(response.statusText)
@@ -34,7 +41,7 @@ const saveImages = (images, outputDir) =>
   Promise.all(
     images.map(async ({ url, created, author, subreddit }) => {
       const response = await fetchWithHeaders(url)
-      const filename = path.join(outputDir, `${subreddit}_${created}.png`)
+      const filename = path.join(outputDir, `${subreddit}_${formatDate(created)}.png`)
       await streamPipeline(response.body, fs.createWriteStream(filename))
     })
   )
