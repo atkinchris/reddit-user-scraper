@@ -10,6 +10,23 @@ const headers = {
   'User-Agent': 'node:scraper:0.1.0 (by /u/atkinchris)',
 }
 
+const transformImageUrl = (url) => {
+  const { ext } = path.parse(url)
+
+  if (ext === '.jpg' || ext === '.png') {
+    return { imageUrl: url, extension: ext }
+  }
+
+  if (url.includes('imgur.com/a')) {
+    return {
+      imageUrl: `${url}/zip`,
+      extension: '.zip',
+    }
+  }
+
+  throw Error(`Non-image URL ${url}`)
+}
+
 const formatDate = (date) =>
   date
     .toISOString()
@@ -40,9 +57,14 @@ const postsToImages = (posts) =>
 const saveImages = (images, outputDir) =>
   Promise.all(
     images.map(async ({ url, created, author, subreddit }) => {
-      const response = await fetchWithHeaders(url)
-      const filename = path.join(outputDir, `${subreddit}_${formatDate(created)}.png`)
-      await streamPipeline(response.body, fs.createWriteStream(filename))
+      try {
+        const { imageUrl, extension } = transformImageUrl(url)
+        const response = await fetchWithHeaders(imageUrl)
+        const filename = path.join(outputDir, `${subreddit}_${formatDate(created)}${extension}`)
+        await streamPipeline(response.body, fs.createWriteStream(filename))
+      } catch (err) {
+        console.log(author, subreddit, created, err.message)
+      }
     })
   )
 
@@ -73,4 +95,4 @@ const run = async (usernames) => {
   }
 }
 
-run(['screamrocket']).catch(console.error)
+run(users).catch(console.error)
