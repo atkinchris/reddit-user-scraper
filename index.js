@@ -91,7 +91,11 @@ const run = async (usernames) => {
   }
 
   for (const username of usernames) {
-    await fetchUsersImages(username, outputDir)
+    try {
+      await fetchUsersImages(username, outputDir)
+    } catch (err) {
+      console.log(`Error fetching "${username}":`, err.message)
+    }
   }
 }
 
