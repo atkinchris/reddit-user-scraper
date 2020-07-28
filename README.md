@@ -2,6 +2,10 @@
 
 Scrapes Reddit user submissions for their main images
 
+## Disclaimer
+
+This is rough and functional, and was created to automate personal tasks. It is not a good example of how to write a Node application.
+
 ## Usage
 
 Requires Node 10+.
