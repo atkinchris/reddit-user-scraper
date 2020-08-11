@@ -61,6 +61,11 @@ const saveImages = (images, outputDir) =>
         const { imageUrl, extension } = transformImageUrl(url)
         const response = await fetchWithHeaders(imageUrl)
         const filename = path.join(outputDir, `${subreddit}_${formatDate(created)}${extension}`)
+
+        if (fs.existsSync(filename)) {
+          return
+        }
+
         await streamPipeline(response.body, fs.createWriteStream(filename))
       } catch (err) {
         console.log(author, subreddit, created, err.message)
