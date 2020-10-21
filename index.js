@@ -24,6 +24,13 @@ const transformImageUrl = (url) => {
     }
   }
 
+  if (url.includes('imgur.com')) {
+    return {
+      imageUrl: `${url}.jpg`,
+      extension: '.jpg',
+    }
+  }
+
   throw Error(`Non-image URL ${url}`)
 }
 
